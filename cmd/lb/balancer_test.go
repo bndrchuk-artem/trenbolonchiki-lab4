@@ -42,3 +42,14 @@ func TestChooseServer(t *testing.T) {
 	if server1 != server2 {
 		t.Errorf("Same client should always get same server. Got %s and %s", server1, server2)
 	}
+	found := false
+	for _, s := range servers {
+		if s == server1 {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Errorf("Returned server %s should be from the server pool", server1)
+	}
+}
