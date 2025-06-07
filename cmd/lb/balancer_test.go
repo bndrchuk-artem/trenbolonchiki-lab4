@@ -115,3 +115,38 @@ func TestChooseServerConsistency(t *testing.T) {
 }
 
 
+func TestChooseServerWithDifferentPoolSizes(t *testing.T) {
+	testCases := []struct {
+		name    string
+		servers []string
+	}{
+		{"SingleServer", []string{"server1:8080"}},
+		{"TwoServers", []string{"server1:8080", "server2:8080"}},
+		{"FiveServers", []string{"server1:8080", "server2:8080", "server3:8080", "server4:8080", "server5:8080"}},
+	}
+
+	clientAddr := "192.168.1.100:12345"
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			server := chooseServer(clientAddr, tc.servers)
+
+			found := false
+			for _, s := range tc.servers {
+				if s == server {
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				t.Errorf("Server %s not found in pool %v", server, tc.servers)
+			}
+
+			server2 := chooseServer(clientAddr, tc.servers)
+			if server != server2 {
+				t.Errorf("Inconsistent server choice: %s vs %s", server, server2)
+			}
+		})
+	}
+}
