@@ -26,3 +26,12 @@ func TestHash(t *testing.T) {
 		t.Logf("Empty string hash is zero")
 	}
 }
+
+func TestChooseServer(t *testing.T) {
+	servers := []string{"server1:8080", "server2:8080", "server3:8080"}
+
+	result := chooseServer("192.168.1.1:12345", []string{})
+	if result != "" {
+		t.Errorf("Expected empty string for empty server pool, got %s", result)
+	}
+
