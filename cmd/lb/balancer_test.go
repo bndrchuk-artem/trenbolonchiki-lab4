@@ -161,3 +161,13 @@ func BenchmarkChooseServer(b *testing.B) {
 		chooseServer(clientAddr, servers)
 	}
 }
+
+
+func BenchmarkHash(b *testing.B) {
+	addr := "192.168.1.1:12345"
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		hash(addr)
+	}
+}
