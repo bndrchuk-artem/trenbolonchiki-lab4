@@ -53,3 +53,32 @@ func TestChooseServer(t *testing.T) {
 		t.Errorf("Returned server %s should be from the server pool", server1)
 	}
 }
+func TestChooseServerDistribution(t *testing.T) {
+	servers := []string{"server1:8080", "server2:8080", "server3:8080"}
+	distribution := make(map[string]int)
+
+	for i := 0; i < 300; i++ {
+		clientAddr := fmt.Sprintf("192.168.1.%d:%d", (i%254)+1, 10000+i)
+		server := chooseServer(clientAddr, servers)
+		distribution[server]++
+	}
+
+	for _, server := range servers {
+		if distribution[server] == 0 {
+			t.Errorf("Server %s received no requests", server)
+		}
+	}
+
+	totalRequests := 300
+	expectedPerServer := totalRequests / len(servers)
+	tolerance := expectedPerServer / 2
+
+	for server, count := range distribution {
+		if count < expectedPerServer-tolerance || count > expectedPerServer+tolerance {
+			t.Logf("Server %s has %d requests (expected around %d)", server, count, expectedPerServer)
+		}
+	}
+
+	t.Logf("Distribution: %v", distribution)
+}
+
