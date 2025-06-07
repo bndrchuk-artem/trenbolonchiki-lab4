@@ -35,3 +35,10 @@ func TestChooseServer(t *testing.T) {
 		t.Errorf("Expected empty string for empty server pool, got %s", result)
 	}
 
+	clientAddr := "192.168.1.1:12345"
+	server1 := chooseServer(clientAddr, servers)
+	server2 := chooseServer(clientAddr, servers)
+
+	if server1 != server2 {
+		t.Errorf("Same client should always get same server. Got %s and %s", server1, server2)
+	}
