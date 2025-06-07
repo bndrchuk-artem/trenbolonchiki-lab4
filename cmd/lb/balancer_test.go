@@ -27,6 +27,7 @@ func TestHash(t *testing.T) {
 	}
 }
 
+
 func TestChooseServer(t *testing.T) {
 	servers := []string{"server1:8080", "server2:8080", "server3:8080"}
 
@@ -53,6 +54,8 @@ func TestChooseServer(t *testing.T) {
 		t.Errorf("Returned server %s should be from the server pool", server1)
 	}
 }
+
+
 func TestChooseServerDistribution(t *testing.T) {
 	servers := []string{"server1:8080", "server2:8080", "server3:8080"}
 	distribution := make(map[string]int)
@@ -81,4 +84,34 @@ func TestChooseServerDistribution(t *testing.T) {
 
 	t.Logf("Distribution: %v", distribution)
 }
+
+
+func TestChooseServerConsistency(t *testing.T) {
+	servers := []string{"server1:8080", "server2:8080", "server3:8080"}
+
+	testCases := []string{
+		"192.168.1.1:12345",
+		"10.0.0.1:8080",
+		"127.0.0.1:54321",
+		"172.16.0.1:9000",
+		"203.0.113.1:80",
+	}
+
+	for _, clientAddr := range testCases {
+		var chosenServers []string
+		for i := 0; i < 10; i++ {
+			server := chooseServer(clientAddr, servers)
+			chosenServers = append(chosenServers, server)
+		}
+
+		firstChoice := chosenServers[0]
+		for i, server := range chosenServers {
+			if server != firstChoice {
+				t.Errorf("Client %s: inconsistent server choice at iteration %d. Expected %s, got %s",
+					clientAddr, i, firstChoice, server)
+			}
+		}
+	}
+}
+
 
