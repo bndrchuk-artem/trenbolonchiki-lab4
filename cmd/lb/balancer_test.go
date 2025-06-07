@@ -150,3 +150,14 @@ func TestChooseServerWithDifferentPoolSizes(t *testing.T) {
 		})
 	}
 }
+
+
+func BenchmarkChooseServer(b *testing.B) {
+	servers := []string{"server1:8080", "server2:8080", "server3:8080"}
+	clientAddr := "192.168.1.1:12345"
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		chooseServer(clientAddr, servers)
+	}
+}
